@@ -4,58 +4,76 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>99 Nights of Common Core Math</title>
+
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Master 6th-grade math with interactive games. Boost your fraction, algebra, and geometry skills!">
+  <meta name="keywords" content="math games, 6th-grade math, fractions, algebra, geometry, interactive learning">
+  <meta name="author" content="700799">
+
+  <!-- OpenGraph for Social Media -->
+  <meta property="og:title" content="99 Nights of Common Core Math">
+  <meta property="og:description" content="Solve math challenges and unlock the secrets of the enchanted forest. Practice your skills!">
+  <meta property="og:image" content="https://yourdomain.com/social-preview.jpg">
+  <meta property="og:url" content="https://yourdomain.com">
+  <meta name="twitter:card" content="summary_large_image">
+
   <style>
     body {
       font-family: Arial, sans-serif;
-      text-align: center;
+      margin: 0;
+      padding: 0;
       background-color: #eef5f9;
     }
-    .npc, .quiz {
-      margin: 20px;
-      padding: 15px;
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    }
-    button {
-      padding: 10px 20px;
+    header {
       background-color: #007BFF;
       color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
+      padding: 20px 0;
+      text-align: center;
     }
-    button:hover {
+    section {
+      padding: 20px;
+    }
+    h1, h2, p {
+      margin: 10px 0;
+    }
+    footer {
+      text-align: center;
+      padding: 10px;
       background-color: #0056b3;
+      color: white;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <h1>99 Nights of Common Core Math</h1>
-  
-  <div class="npc">
-    <h2>Owl NPC</h2>
-    <p>Hoot! Solve this math problem to light up the next path in the forest:</p>
-    <button onclick="fetchProblem()">Get a Problem</button>
-  </div>
+  <header>
+    <h1>99 Nights of Common Core Math</h1>
+    <p>Master Common Core math with interactive challenges.</p>
+  </header>
 
-  <div class="quiz" id="quiz" style="display: none;">
-    <h3 id="question">Question will appear here</h3>
-    <p id="hint">Hint will appear here</p>
-  </div>
+  <!-- Main Body Content -->
+  <section>
+    <h2>Interactive Math Challenges</h2>
+    <p>Practice fractions, geometry, statistics, and more through an immersive, interactive, and engaging game.</p>
+    <h3>What Makes Us Special?</h3>
+    <p>Our step-by-step hints and enchanting environment ensure that every problem helps you learn more effectively.</p>
+  </section>
 
-  <script>
-    async function fetchProblem() {
-      const response = await fetch('/api/problems');
-      const data = await response.json();
-      const quizDiv = document.getElementById('quiz');
+  <!-- FAQ Section for SEO -->
+  <section>
+    <h2>Frequently Asked Questions</h2>
+    <h3>What is 99 Nights of Math?</h3>
+    <p>An interactive game to help students practice 6th-grade Common Core math skills like fractions, geometry, and statistics.</p>
 
-      if (data.length > 0) {
-        quizDiv.style.display = 'block';
-        document.getElementById('question').textContent = data[0].question;
-        document.getElementById('hint').textContent = `Hint: ${data[0].hint}`;
-      }
-    }
-  </script>
+    <h3>Who is it for?</h3>
+    <p>This game is ideal for students, teachers, and parents looking for a fun way to improve foundational math skills.</p>
+
+    <h3>How do I get started?</h3>
+    <p>You can play directly in your browser after following the <a href="https://github.com/700799/99NightsOfMath">installation instructions</a>.</p>
+  </section>
+
+  <footer>
+    <p>&copy; 2026 99 Nights of Math. All rights reserved.</p>
+  </footer>
 </body>
 </html>
