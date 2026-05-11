@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>99 Nights of Common Core Math</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #eef5f9;
+    }
+    .npc, .quiz {
+      margin: 20px;
+      padding: 15px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>99 Nights of Common Core Math</h1>
+  
+  <div class="npc">
+    <h2>Owl NPC</h2>
+    <p>Hoot! Solve this math problem to light up the next path in the forest:</p>
+    <button onclick="fetchProblem()">Get a Problem</button>
+  </div>
+
+  <div class="quiz" id="quiz" style="display: none;">
+    <h3 id="question">Question will appear here</h3>
+    <p id="hint">Hint will appear here</p>
+  </div>
+
+  <script>
+    async function fetchProblem() {
+      const response = await fetch('/api/problems');
+      const data = await response.json();
+      const quizDiv = document.getElementById('quiz');
+
+      if (data.length > 0) {
+        quizDiv.style.display = 'block';
+        document.getElementById('question').textContent = data[0].question;
+        document.getElementById('hint').textContent = `Hint: ${data[0].hint}`;
+      }
+    }
+  </script>
+</body>
+</html>
