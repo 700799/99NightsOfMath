@@ -38,6 +38,14 @@ test("each manifest font exists and ships its OFL license", () => {
   }
 });
 
+test("favicon exists and is linked from every HTML page", () => {
+  assert.ok(fs.existsSync(path.join(PUBLIC, "favicon.svg")), "missing public/favicon.svg");
+  for (const page of ["play.html", "index.html", "admin.html"]) {
+    const html = fs.readFileSync(path.join(PUBLIC, page), "utf8");
+    assert.match(html, /rel="icon"[^>]*favicon\.svg/, `${page} does not link favicon.svg`);
+  }
+});
+
 test("sprite SVGs declare explicit width/height (needed for <canvas> drawImage)", () => {
   // Coin Dash draws these on a canvas; an SVG with no intrinsic size renders blank.
   for (const id of ["coin", "bomb", "basket"]) {
