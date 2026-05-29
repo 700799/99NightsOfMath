@@ -20,6 +20,17 @@ Define logic for level progression and adaptive challenges.
 2. **`POST /api/next-level`**:
    - Moves player to the next level.
    - Returns confirmation of new level.
+3. **`GET /api/practice`**:
+   - Returns a single, freshly randomized problem drawn from **all** topics
+     (fractions, algebra, ratios, geometry, statistics), each tagged with its
+     `topic`.
+   - Powers the mixed-practice "focus" loop so long study sessions stay varied.
+
+## Focus Time → Reward Breaks
+Progression is paced by a work/play ratio in addition to level unlocks. As a
+student practices, focused time accrues toward a goal (default 30 minutes); on
+reaching it, a timed reward break unlocks. The ratio is admin-configurable via
+`GET`/`POST /api/reward/config`. See [Reward Breaks](reward-breaks.md).
 
 ## Example Workflow
 1. User starts at Level 1.
