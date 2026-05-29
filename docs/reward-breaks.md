@@ -44,6 +44,34 @@ ends.
    timers/animation frames if the break ends mid-game.
 4. Add a `<script>` tag for it in `public/play.html` (after `arcade.js`).
 
+## Graphics & "juice"
+The arcade uses original SVG sprite art (`public/assets/sprites/`, catalogued in
+`public/js/fx-manifest.js`) and a self-hosted OFL display font
+(`public/assets/fonts/`). All visual/audio polish lives in one shared module,
+`public/js/fx.js` (`window.Fx`), which `arcade.js` exposes to every game as
+`api.fx`:
+
+- `Fx.burst({x,y,shape,colors,count,…})` / `Fx.burstAt(el, …)` — localized
+  particle bursts (coin/star/spark) on a single shared canvas + one self-ending
+  rAF loop. `Fx.confetti()` is the full-screen preset (`api.confetti` delegates
+  to it).
+- `Fx.shake(el, intensity, ms)` — screen shake; always target `api.stage()`,
+  never a sprite the game transforms itself.
+- `Fx.sound(name[, level])` — WebAudio-synthesized cues (`coin, match, pop, win,
+  error, tick, pump`); no audio files. The AudioContext unlocks on the first
+  user gesture; a persisted 🔊/🔇 toggle lives in the arcade bar.
+- `Fx.haptic(pattern)` — `navigator.vibrate` wrapper (no-op where unsupported).
+- `Fx.highScore(id, value)` / `Fx.bestTime(id, ms)` — per-game bests driving the
+  "new best!" flourishes.
+- `Fx.sprite(id)` / `Fx.preload(ids)` — cached `Image` objects for the Canvas
+  game (Coin Dash); DOM games reference sprite paths from `window.FxAssets`.
+
+Accessibility: `prefers-reduced-motion` suppresses shake and heavy animation
+(keeping end-states) and trims particle counts; audio is controlled
+independently by the mute toggle. To add art for a new game, drop the `.svg`
+into `public/assets/sprites/`, register its path in `fx-manifest.js`, and the
+asset test will assert it exists.
+
 ## API
 | Method | Endpoint | Auth | Purpose |
 | ------ | -------- | ---- | ------- |

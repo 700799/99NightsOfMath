@@ -8,8 +8,20 @@ Arcade.register({
   skill: "Memory",
 
   mount(root, api) {
-    const FACES = ["🌟", "🍄", "🐢", "🌸", "🔥", "💎", "🦊", "🎵"];
+    const FACES = [
+      { key: "star", sprite: "faceStar" },
+      { key: "mushroom", sprite: "faceMushroom" },
+      { key: "turtle", sprite: "faceTurtle" },
+      { key: "flower", sprite: "faceFlower" },
+      { key: "flame", sprite: "faceFlame" },
+      { key: "gem", sprite: "faceGem" },
+      { key: "fox", sprite: "faceFox" },
+      { key: "note", sprite: "faceNote" },
+    ];
     const ROUND_MS = 60000;
+    const FX = api.fx;
+    const PATHS = (window.FxAssets && window.FxAssets.sprites) || {};
+    const STARS = ["#f6c945", "#ffd56b", "#fff5cf"];
 
     root.innerHTML = `
       <div class="game-status" id="mmStatus">Match all 8 pairs!</div>
@@ -20,10 +32,11 @@ Arcade.register({
     const statusEl = root.querySelector("#mmStatus");
     const timerEl = root.querySelector("#mmTimer");
 
-    // Build & shuffle deck.
+    // Build & shuffle deck (two of each face).
     const deck = FACES.concat(FACES)
-      .map((face) => ({ face, sort: Math.random() }))
-      .sort((a, b) => a.sort - b.sort);
+      .map((item) => ({ item, sort: Math.random() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map((d) => d.item);
 
     let first = null;
     let lock = false;
@@ -42,7 +55,11 @@ Arcade.register({
       const card = document.createElement("div");
       card.className = "mem-card";
       card.dataset.index = i;
-      card.innerHTML = `<span class="face">${item.face}</span>`;
+      card.innerHTML = `
+        <div class="mem-card__inner">
+          <div class="mem-face mem-face--front"><img src="${PATHS.cardBack || ""}" alt=""></div>
+          <div class="mem-face mem-face--back"><img src="${PATHS[item.sprite] || ""}" alt=""></div>
+        </div>`;
       card.addEventListener("click", () => flip(card, item));
       grid.appendChild(card);
     });
@@ -52,6 +69,7 @@ Arcade.register({
       if (card.classList.contains("flipped") || card.classList.contains("matched")) return;
 
       card.classList.add("flipped");
+      if (FX) FX.sound("tick");
 
       if (!first) {
         first = { card, item };
@@ -59,13 +77,22 @@ Arcade.register({
       }
 
       moves += 1;
-      if (first.item.face === item.face) {
+      if (first.item.key === item.key) {
         first.card.classList.add("matched");
         card.classList.add("matched");
+        card.classList.add("fx-pop");
+        first.card.classList.add("fx-pop");
+        if (FX) {
+          FX.sound("match");
+          FX.burstAt(card, { shape: "star", colors: STARS, count: 14, speed: 5 });
+          FX.burstAt(first.card, { shape: "star", colors: STARS, count: 10, speed: 5 });
+          FX.haptic(15);
+        }
         first = null;
         matched += 1;
         if (matched === FACES.length) finish(true);
       } else {
+        if (FX) FX.sound("error");
         lock = true;
         const a = first.card;
         const b = card;
@@ -88,10 +115,17 @@ Arcade.register({
       let stars = 0;
       if (complete) stars = moves <= 12 ? 2 : 1;
 
+      // Fewer moves is better → "new best" flourish on a clean clear.
+      let summary = "Memory Match";
+      if (complete && FX) {
+        const { isNewBest } = FX.bestTime("memory-match", moves);
+        if (isNewBest) summary = "Memory Match — FEWEST MOVES! 🏆";
+      }
+
       statusEl.textContent = complete
         ? `Cleared in ${moves} moves! 🎉`
         : `Time! You matched ${matched}/${FACES.length} pairs.`;
-      api.finish({ coins, stars, summary: "Memory Match" });
+      api.finish({ coins, stars, summary });
     }
 
     return {

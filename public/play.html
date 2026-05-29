@@ -48,6 +48,9 @@
     </p>
   </main>
 
+  <!-- Shared FX toolbox + asset manifest load first (dependency of all below). -->
+  <script src="/js/fx-manifest.js"></script>
+  <script src="/js/fx.js"></script>
   <!-- Arcade engine, then each registered mini-game, then the focus loop. -->
   <script src="/js/arcade.js"></script>
   <script src="/js/games/coinDash.js"></script>

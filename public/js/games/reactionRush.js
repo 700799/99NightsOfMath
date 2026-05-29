@@ -9,6 +9,8 @@ Arcade.register({
 
   mount(root, api) {
     const ROUNDS = 3;
+    const FX = api.fx;
+    const PATHS = (window.FxAssets && window.FxAssets.sprites) || {};
 
     root.innerHTML = `
       <div class="game-status" id="rrStatus">Tap to start. Wait for green, then TAP!</div>
@@ -35,8 +37,12 @@ Arcade.register({
         if (destroyed) return;
         phase = "go";
         pad.className = "reaction-pad go";
-        pad.textContent = "TAP! ⭐";
+        pad.innerHTML = `<img class="rr-target fx-pop" src="${PATHS.targetGo || ""}" alt="TAP!">`;
         goTime = performance.now();
+        if (FX) {
+          FX.sound("coin");
+          FX.haptic(15);
+        }
       }, delay);
     }
 
@@ -59,6 +65,11 @@ Arcade.register({
         pad.textContent = "Too soon! Tap to retry";
         statusEl.textContent = "Wait for green next time!";
         phase = "idle";
+        if (FX) {
+          FX.sound("error");
+          FX.shake(api.stage(), 8, 300);
+          FX.haptic([0, 40]);
+        }
         return;
       }
 
@@ -66,6 +77,11 @@ Arcade.register({
         const ms = Math.round(performance.now() - goTime);
         times.push(ms);
         round += 1;
+        if (FX) {
+          FX.burstAt(pad, { shape: "star", colors: ["#f6c945", "#ffd56b", "#fff5cf"], count: 14, speed: 5 });
+          FX.sound("match");
+          FX.haptic(12);
+        }
         logEl.textContent = times.map((t, i) => `#${i + 1}: ${t}ms`).join("   ");
         if (round >= ROUNDS) {
           finish();
@@ -96,7 +112,14 @@ Arcade.register({
       if (avg < 280) { coins = 14; stars = 2; }
       else if (avg < 360) { coins = 10; stars = 1; }
       else if (avg < 460) { coins = 7; }
-      api.finish({ coins, stars, summary: "Reaction Rush" });
+
+      // Lower time is better → "new best" flourish.
+      let summary = "Reaction Rush";
+      if (FX) {
+        const { isNewBest } = FX.bestTime("reaction-rush", avg);
+        if (isNewBest) summary = `Reaction Rush — NEW BEST ${avg}ms! 🏆`;
+      }
+      api.finish({ coins, stars, summary });
     }
 
     pad.addEventListener("click", handleTap);

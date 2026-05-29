@@ -16,6 +16,12 @@ focus goal, a **play break** unlocks: a timed arcade of mini-games — Coin Dash
 Memory Match, Reaction Rush, Dice Duel, and Balloon Pump — where you bank coins
 and stars. When the break timer runs out, you're back to practice, recharged.
 
+The arcade ships with original SVG sprite art, a self-hosted display font, and
+full "juice" — particle bursts, screen shake, WebAudio sound effects (with a
+🔊/🔇 toggle), haptics, and victory flourishes. It respects
+`prefers-reduced-motion`, and the build stays dependency-free with no build step.
+See [Reward Breaks](docs/reward-breaks.md) for the graphics/FX architecture.
+
 ### Managing the work/play ratio
 The ratio is a global, server-persisted setting that admins control at
 `/admin.html`:

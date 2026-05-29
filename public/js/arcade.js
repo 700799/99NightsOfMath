@@ -24,52 +24,9 @@
     return `${m}:${String(r).padStart(2, "0")}`;
   }
 
-  // ---- Confetti -----------------------------------------------------------
+  // ---- Confetti (delegates to the shared Fx particle system) --------------
   function confetti(durationMs = 1600) {
-    let canvas = document.getElementById("confettiCanvas");
-    if (!canvas) {
-      canvas = document.createElement("canvas");
-      canvas.id = "confettiCanvas";
-      document.body.appendChild(canvas);
-    }
-    const ctx = canvas.getContext("2d");
-    const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-    resize();
-    const colors = ["#f6c945", "#1f6feb", "#2bb673", "#e4572e", "#7c5cff", "#ff5c8a"];
-    const pieces = Array.from({ length: 140 }, () => ({
-      x: Math.random() * canvas.width,
-      y: -20 - Math.random() * canvas.height,
-      r: 4 + Math.random() * 6,
-      c: colors[(Math.random() * colors.length) | 0],
-      vy: 2 + Math.random() * 4,
-      vx: -2 + Math.random() * 4,
-      rot: Math.random() * Math.PI,
-      vr: -0.2 + Math.random() * 0.4,
-    }));
-    const start = performance.now();
-    function frame(now) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      for (const p of pieces) {
-        p.x += p.vx;
-        p.y += p.vy;
-        p.rot += p.vr;
-        ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.rotate(p.rot);
-        ctx.fillStyle = p.c;
-        ctx.fillRect(-p.r / 2, -p.r / 2, p.r, p.r * 1.6);
-        ctx.restore();
-      }
-      if (now - start < durationMs) {
-        requestAnimationFrame(frame);
-      } else {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-      }
-    }
-    requestAnimationFrame(frame);
+    if (window.Fx) Fx.confetti(durationMs);
   }
 
   function toast(message, ms = 2200) {
@@ -131,6 +88,7 @@
         <div class="arcade-title">🎉 PLAY BREAK</div>
         <div class="arcade-timer" id="arcadeTimer">0:00</div>
         <div class="arcade-tally" id="arcadeTally">🪙 0   ⭐ 0</div>
+        <button class="arcade-mute" id="arcadeMute" title="Sound on/off" aria-label="Toggle sound">🔊</button>
         <button class="arcade-end" id="arcadeEnd">End early ✕</button>
       </div>
       <div class="arcade-body" id="arcadeBody"></div>
@@ -143,6 +101,17 @@
     state.timerEl = overlay.querySelector("#arcadeTimer");
     state.tallyEl = overlay.querySelector("#arcadeTally");
     overlay.querySelector("#arcadeEnd").addEventListener("click", () => endBreak(false));
+
+    // Mute toggle lives in the bar so it's reachable during any game.
+    const muteBtn = overlay.querySelector("#arcadeMute");
+    const renderMute = () => {
+      muteBtn.textContent = window.Fx && Fx.isMuted() ? "🔇" : "🔊";
+    };
+    muteBtn.addEventListener("click", () => {
+      if (window.Fx) Fx.toggleMuted();
+      renderMute();
+    });
+    renderMute();
 
     renderTimer();
     renderTally();
@@ -208,6 +177,11 @@
       secondsLeft: () => (state ? state.secondsLeft : 0),
       finish: (result) => onGameFinish(game, result || {}),
       confetti,
+      fx: window.Fx,
+      gameId: game.id,
+      // The stage element is the safe shake target (never the game's own
+      // transformed sprites).
+      stage: () => state && state.bodyEl ? state.bodyEl.querySelector(".game-stage") : null,
     };
 
     teardownActiveGame();
@@ -224,7 +198,10 @@
 
     if (coins && state.hooks.onCoins) state.hooks.onCoins(coins);
     if (stars && state.hooks.onStars) state.hooks.onStars(stars);
-    if (stars > 0) confetti(900);
+    if (stars > 0) {
+      confetti(900);
+      if (window.Fx) Fx.sound("win");
+    }
 
     const bits = [];
     if (coins) bits.push(`+${coins} 🪙`);
