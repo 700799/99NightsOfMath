@@ -1,0 +1,5 @@
+node_modules/
+npm-debug.log*
+
+# Runtime-generated admin config (created by the reward-config endpoint)
+data/

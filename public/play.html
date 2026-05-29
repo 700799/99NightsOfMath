@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Focus &amp; Play — 99 Nights of Math</title>
+  <meta name="description" content="Practice 6th-grade math, then earn Mario-Party-style reward mini-games as a mental break." />
+  <link rel="stylesheet" href="/css/arcade.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><a href="/">🌲 99 Nights of Math</a></div>
+    <div class="wallet">
+      <span>🪙 <span id="coinCount">0</span></span>
+      <span>⭐ <span id="starCount">0</span></span>
+    </div>
+  </header>
+
+  <main id="focusView">
+    <section class="focus-meter">
+      <div class="meter-label">🎯 Focus until your next play break</div>
+      <div class="progress"><div class="progress-fill" id="breakProgress"></div></div>
+      <div class="meter-stats">
+        <span><b id="focusElapsed">0:00</b> / <span id="focusGoal">30:00</span> focused</span>
+        <span class="pill" id="ratioPill">30 min focus → 5 min play</span>
+      </div>
+    </section>
+
+    <section class="practice card">
+      <div class="practice-head">
+        <span class="topic-badge" id="problemTopic">Practice</span>
+        <span class="solved-count">Solved today: <b id="solvedCount">0</b></span>
+      </div>
+      <div class="question" id="problemQuestion">Loading a problem…</div>
+      <form id="answerForm">
+        <input id="answerInput" autocomplete="off" inputmode="text" placeholder="Type your answer…" />
+        <button type="submit">Check</button>
+      </form>
+      <div class="practice-actions">
+        <button id="hintBtn" class="ghost" type="button">💡 Hint</button>
+        <button id="skipBtn" class="ghost" type="button">Skip ↦</button>
+      </div>
+      <div class="feedback" id="feedback"></div>
+    </section>
+
+    <p class="paused-note" id="pausedNote" hidden>
+      ⏸ Focus timer paused — come back to this tab to keep earning your break.
+    </p>
+  </main>
+
+  <!-- Arcade engine, then each registered mini-game, then the focus loop. -->
+  <script src="/js/arcade.js"></script>
+  <script src="/js/games/coinDash.js"></script>
+  <script src="/js/games/memoryMatch.js"></script>
+  <script src="/js/games/reactionRush.js"></script>
+  <script src="/js/games/diceDuel.js"></script>
+  <script src="/js/games/balloonPump.js"></script>
+  <script src="/js/focus.js"></script>
+</body>
+</html>

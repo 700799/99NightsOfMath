@@ -4,17 +4,26 @@
 Utilize Claude or other AI agents to assist in building functionality for "99 Nights of Math".
 
 ## Core Skills for Agents
-1. **Dynamic Math Problem Generation**:
-   - Create flexible algorithms to generate problems across topics (fractions, ratios, geometry, statistics).
-   - Use Claude to fine-tune difficulty settings based on user levels.
+1. **Dynamic Math Problem Generation** *(implemented)*:
+   - Flexible generators produce randomized problems across topics (fractions,
+     algebra, ratios, geometry, statistics) with computed, verified answers.
+   - Next: fine-tune difficulty settings based on user levels.
 
 2. **Backend Logic Generation**:
-   - Build endpoints like `GET /api/problems` or `POST /api/next-level`.
+   - Build endpoints like `GET /api/problems`, `POST /api/next-level`,
+     `GET /api/practice`, and the reward-config endpoints.
    - Implement level-tracking systems.
 
 3. **Frontend Interactions**:
    - Guide Claude to create customizable components for quizzes and dialogues.
    - Suggest UI/UX best practices for user engagement.
+
+4. **Reward Arcade & Pacing** *(implemented)*:
+   - A pluggable arcade engine runs timed reward breaks; each mini-game is a
+     self-contained module that registers itself and reports coins/stars.
+   - An admin-configurable work/play ratio gates breaks. See
+     [Reward Breaks](reward-breaks.md) for the game contract and how to add a
+     new mini-game.
 
 ## Markdown Guidance for Claude
 Use Markdown files to:
