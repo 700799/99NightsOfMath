@@ -10,6 +10,7 @@ Arcade.register({
 
   mount(root, api) {
     const ROUND_MS = 20000;
+    const FX = api.fx;
 
     root.innerHTML = `
       <div class="game-status" id="bpStatus">Pump for coins, then Bank before it pops!</div>
@@ -40,15 +41,22 @@ Arcade.register({
     let startTime = 0;
     let timerHandle = null;
 
+    // Size is driven by a CSS var so the squash-and-stretch keyframes compose
+    // with the current scale instead of clobbering it.
     function setBalloonScale() {
       const scale = 1 + pumps * 0.18;
-      balloon.style.transform = `scale(${scale})`;
+      balloon.style.setProperty("--s", scale);
+    }
+    function squash() {
+      balloon.classList.remove("squash");
+      void balloon.offsetWidth; // restart the animation
+      balloon.classList.add("squash");
     }
 
     function resetBalloon() {
       pumps = 0;
       risk = 0;
-      balloon.classList.remove("popped");
+      balloon.classList.remove("popped", "squash");
       setBalloonScale();
       riskEl.textContent = "0";
     }
@@ -71,13 +79,24 @@ Arcade.register({
       risk += 3;
       riskEl.textContent = String(risk);
       setBalloonScale();
+      squash();
+      if (FX) {
+        FX.sound("pump", pumps); // pitch rises with each pump
+        FX.haptic(10);
+      }
 
       // Pop chance climbs with each pump.
       const popChance = Math.min(0.85, pumps * 0.06);
       if (Math.random() < popChance) {
+        balloon.classList.remove("squash");
         balloon.classList.add("popped");
-        balloon.style.transform = "scale(0.4)";
         statusEl.textContent = `💥 POP! Lost ${risk} coins. Keep going!`;
+        if (FX) {
+          FX.sound("pop");
+          FX.shake(api.stage(), 9, 320);
+          FX.haptic([0, 40]);
+          FX.burstAt(balloon, { shape: "spark", colors: ["#e4572e", "#ff8a3d", "#ff9d7e"], count: 18, speed: 7 });
+        }
         setTimeout(resetBalloon, 450);
       } else {
         statusEl.textContent = `Risking ${risk} 🪙 — bank it or push your luck?`;
@@ -90,6 +109,11 @@ Arcade.register({
       banked += risk;
       bankEl.textContent = String(banked);
       statusEl.textContent = `Banked ${risk} 🪙! Pump again.`;
+      if (FX) {
+        FX.sound("coin");
+        FX.burstAt(balloon, { shape: "coin", colors: ["#f6c945", "#ffd56b", "#fff5cf"], count: 14, speed: 6 });
+        FX.haptic(15);
+      }
       resetBalloon();
     }
 
@@ -102,8 +126,13 @@ Arcade.register({
 
       const coins = banked;
       const stars = coins >= 45 ? 2 : coins >= 22 ? 1 : 0;
+      let summary = "Balloon Pump";
+      if (FX) {
+        const { isNewBest } = FX.highScore("balloon-pump", coins);
+        if (isNewBest && coins > 0) summary = "Balloon Pump — NEW BEST! 🏆";
+      }
       statusEl.textContent = `Time! You banked ${coins} coins. 🎈`;
-      api.finish({ coins, stars, summary: "Balloon Pump" });
+      api.finish({ coins, stars, summary });
     }
 
     pumpBtn.addEventListener("click", pump);

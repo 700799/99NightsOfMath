@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Focus &amp; Play — 99 Nights of Math</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <meta name="description" content="Practice 6th-grade math, then earn Mario-Party-style reward mini-games as a mental break." />
   <link rel="stylesheet" href="/css/arcade.css" />
 </head>
@@ -48,6 +49,9 @@
     </p>
   </main>
 
+  <!-- Shared FX toolbox + asset manifest load first (dependency of all below). -->
+  <script src="/js/fx-manifest.js"></script>
+  <script src="/js/fx.js"></script>
   <!-- Arcade engine, then each registered mini-game, then the focus loop. -->
   <script src="/js/arcade.js"></script>
   <script src="/js/games/coinDash.js"></script>

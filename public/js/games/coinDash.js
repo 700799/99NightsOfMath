@@ -35,6 +35,21 @@ Arcade.register({
     let lastSpawn = 0;
     let flash = 0;
 
+    const FX = api.fx;
+    const sprites = {
+      coin: FX && FX.sprite("coin"),
+      bomb: FX && FX.sprite("bomb"),
+      basket: FX && FX.sprite("basket"),
+    };
+    if (FX) FX.preload(["coin", "bomb", "basket"]);
+
+    // Canvas coords → viewport coords (for particle bursts).
+    function toViewport(cx, cy) {
+      const rect = canvas.getBoundingClientRect();
+      return { x: rect.left + (cx / W) * rect.width, y: rect.top + (cy / H) * rect.height };
+    }
+    const ready = (img) => img && img.complete && img.naturalWidth;
+
     function setBasketByClientX(clientX) {
       const rect = canvas.getBoundingClientRect();
       const scale = W / rect.width;
@@ -70,33 +85,44 @@ Arcade.register({
     function draw(remaining) {
       ctx.clearRect(0, 0, W, H);
 
-      // falling items
+      // falling items — SVG sprites with a vector fallback until they load
       for (const d of drops) {
-        ctx.beginPath();
-        ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
-        if (d.bomb) {
-          ctx.fillStyle = "#2b2b3a";
-          ctx.fill();
-          ctx.font = "16px serif";
-          ctx.fillText("💣", d.x - 9, d.y + 6);
+        const img = d.bomb ? sprites.bomb : sprites.coin;
+        if (ready(img)) {
+          const s = d.r * 2.3;
+          ctx.drawImage(img, d.x - s / 2, d.y - s / 2, s, s);
         } else {
-          ctx.fillStyle = "#f6c945";
-          ctx.fill();
-          ctx.strokeStyle = "#caa21f";
-          ctx.lineWidth = 3;
-          ctx.stroke();
-          ctx.fillStyle = "#caa21f";
-          ctx.font = "bold 14px sans-serif";
-          ctx.fillText("$", d.x - 4, d.y + 5);
+          ctx.beginPath();
+          ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+          if (d.bomb) {
+            ctx.fillStyle = "#2b2b3a";
+            ctx.fill();
+          } else {
+            ctx.fillStyle = "#f6c945";
+            ctx.fill();
+            ctx.strokeStyle = "#caa21f";
+            ctx.lineWidth = 3;
+            ctx.stroke();
+          }
         }
       }
 
       // basket
-      ctx.fillStyle = flash > 0 ? "#e4572e" : "#1f6feb";
       const by = H - 34;
-      ctx.fillRect(basket.x, by, basket.w, basket.h);
-      ctx.fillRect(basket.x - 4, by, 4, basket.h + 6);
-      ctx.fillRect(basket.x + basket.w, by, 4, basket.h + 6);
+      if (ready(sprites.basket)) {
+        ctx.drawImage(sprites.basket, basket.x - 8, by - 8, basket.w + 16, 38);
+      } else {
+        ctx.fillStyle = "#1f6feb";
+        ctx.fillRect(basket.x, by, basket.w, basket.h);
+        ctx.fillRect(basket.x - 4, by, 4, basket.h + 6);
+        ctx.fillRect(basket.x + basket.w, by, 4, basket.h + 6);
+      }
+
+      // bomb-hit flash overlay
+      if (flash > 0) {
+        ctx.fillStyle = `rgba(228, 87, 46, ${flash / 24})`;
+        ctx.fillRect(0, 0, W, H);
+      }
 
       // HUD
       ctx.fillStyle = "#1c2541";
@@ -131,8 +157,24 @@ Arcade.register({
           if (d.bomb) {
             coins = Math.max(0, coins - 3);
             flash = 8;
+            if (FX) {
+              FX.sound("pop");
+              FX.shake(api.stage(), 8, 300);
+              FX.haptic([0, 30]);
+            }
           } else {
             coins += 1;
+            if (FX) {
+              const v = toViewport(d.x, by);
+              FX.burst({
+                x: v.x, y: v.y,
+                shape: "coin",
+                colors: ["#f6c945", "#ffd56b", "#fff5cf"],
+                count: 8, speed: 5, lifeMs: 600,
+              });
+              FX.sound("coin");
+              FX.haptic(10);
+            }
           }
           return false;
         }
@@ -152,8 +194,13 @@ Arcade.register({
       running = false;
       cancelAnimationFrame(raf);
       const stars = coins >= 18 ? 2 : coins >= 9 ? 1 : 0;
+      let summary = "Coin Dash";
+      if (FX) {
+        const { isNewBest } = FX.highScore("coin-dash", coins);
+        if (isNewBest && coins > 0) summary = "Coin Dash — NEW BEST! 🏆";
+      }
       statusEl.textContent = `Round over — ${coins} coins caught!`;
-      api.finish({ coins, stars, summary: "Coin Dash" });
+      api.finish({ coins, stars, summary });
     }
 
     function start() {
