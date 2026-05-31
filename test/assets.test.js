@@ -48,7 +48,7 @@ test("favicon exists and is linked from every HTML page", () => {
 
 test("sprite SVGs declare explicit width/height (needed for <canvas> drawImage)", () => {
   // Coin Dash draws these on a canvas; an SVG with no intrinsic size renders blank.
-  for (const id of ["coin", "bomb", "basket"]) {
+  for (const id of ["coin", "bomb", "basket", "mole"]) {
     const file = path.join(PUBLIC, assets.sprites[id]);
     const svg = fs.readFileSync(file, "utf8");
     assert.match(svg, /<svg[^>]*\bwidth=/, `${id}.svg missing width`);
@@ -67,10 +67,18 @@ test("new/edited client scripts parse (node --check)", () => {
     "public/js/games/reactionRush.js",
     "public/js/games/diceDuel.js",
     "public/js/games/balloonPump.js",
+    "public/js/games/moleBonk.js",
+    "public/js/games/towerStack.js",
+    "public/js/games/echo.js",
+    "public/js/games/starChase.js",
   ];
+  // Spawn with a clean NODE_OPTIONS so the parent test runner's flags (e.g. a
+  // reporter destination + --test-isolation=none) don't leak into the child
+  // syntax check; a real syntax error still surfaces via a non-zero exit.
+  const checkEnv = { ...process.env, NODE_OPTIONS: "" };
   for (const rel of files) {
     try {
-      execFileSync("node", ["--check", path.join(ROOT, rel)], { stdio: "pipe" });
+      execFileSync("node", ["--check", path.join(ROOT, rel)], { stdio: "pipe", env: checkEnv });
     } catch (err) {
       assert.fail(`syntax error in ${rel}:\n${err.stderr || err.message}`);
     }

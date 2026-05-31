@@ -474,6 +474,125 @@ button.ghost:hover { background: #e0e5f7; }
   100% { transform: scale(0.5) rotate(-6deg); opacity: 0.6; }
 }
 
+/* ---------- Bonk! (Whack-a-Mole) ---------- */
+.bonk-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  max-width: 360px;
+  margin: 0 auto;
+}
+.bonk-hole {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 35%, #5a3a22 0%, #3a2414 70%);
+  overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+  box-shadow: inset 0 -8px 12px rgba(0, 0, 0, 0.35);
+}
+.bonk-mound {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 30%;
+  background: #6f4626;
+  border-radius: 50%;
+}
+.bonk-actor {
+  position: absolute;
+  left: 12%;
+  width: 76%;
+  bottom: -90%;
+  transition: bottom 0.12s ease;
+  pointer-events: none;
+}
+.bonk-hole.up .bonk-actor { bottom: 12%; }
+.bonk-hole.bonked { animation: fxPop 0.35s ease; }
+.bonk-hole.boom { animation: bonkBoom 0.4s ease; }
+@keyframes bonkBoom {
+  0% { box-shadow: inset 0 0 0 4px var(--bad); }
+  100% { box-shadow: inset 0 -8px 12px rgba(0, 0, 0, 0.35); }
+}
+
+/* ---------- Tower Stack ---------- */
+.tower-canvas {
+  display: block;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 360px;
+  height: auto;
+  aspect-ratio: 360 / 460;
+  border-radius: 14px;
+  touch-action: none;
+  background: linear-gradient(#cfe9ff, #eef7ff);
+}
+
+/* ---------- Echo (Simon) ---------- */
+.echo-pads {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  max-width: 320px;
+  margin: 0 auto;
+}
+.echo-pad {
+  aspect-ratio: 1 / 1;
+  border: none;
+  border-radius: 18px;
+  cursor: pointer;
+  opacity: 0.62;
+  transition: opacity 0.12s ease, transform 0.12s ease;
+  box-shadow: var(--shadow);
+}
+.echo-pad:nth-child(1) { background: var(--good); }
+.echo-pad:nth-child(2) { background: var(--bad); }
+.echo-pad:nth-child(3) { background: var(--blue); }
+.echo-pad:nth-child(4) { background: var(--gold); }
+.echo-pad.lit {
+  opacity: 1;
+  transform: scale(1.04);
+  box-shadow: 0 0 22px 4px rgba(255, 255, 255, 0.6), var(--shadow);
+}
+
+/* ---------- Star Chase ---------- */
+.star-canvas {
+  display: block;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  border-radius: 14px;
+  touch-action: none;
+  background: #e8f0ff;
+}
+.star-dpad {
+  display: grid;
+  grid-template-columns: repeat(3, 52px);
+  grid-template-rows: repeat(3, 52px);
+  gap: 8px;
+  justify-content: center;
+  margin: 14px auto 0;
+}
+.dpad-btn {
+  background: var(--blue);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  font-weight: 900;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.dpad-btn:hover { background: var(--blue-dark); }
+.dpad-up { grid-area: 1 / 2; }
+.dpad-left { grid-area: 2 / 1; }
+.dpad-right { grid-area: 2 / 3; }
+.dpad-down { grid-area: 3 / 2; }
+
 @media (max-width: 520px) {
   .question { font-size: 1.15rem; }
   .game-grid { grid-template-columns: 1fr 1fr; }
@@ -521,7 +640,8 @@ button.ghost:hover { background: #e0e5f7; }
 /* Respect users who prefer less motion: keep end-states, drop the animation. */
 @media (prefers-reduced-motion: reduce) {
   .mem-card__inner, .dice, .balloon,
-  .fx-bounce, .fx-pop, .fx-glow, .game-card {
+  .fx-bounce, .fx-pop, .fx-glow, .game-card,
+  .bonk-actor, .bonk-hole, .echo-pad {
     transition: none !important;
     animation: none !important;
   }
@@ -529,4 +649,6 @@ button.ghost:hover { background: #e0e5f7; }
   .mem-card.matched .mem-card__inner { transform: rotateY(180deg); }
   .arcade-timer.low { animation: none; }
   .game-card:hover { transform: none; }
+  .bonk-hole.up .bonk-actor { bottom: 12%; }
+  .echo-pad.lit { opacity: 1; }
 }

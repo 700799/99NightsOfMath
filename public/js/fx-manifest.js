@@ -24,6 +24,7 @@
       balloon: SP + "balloon.svg",
       balloonPop: SP + "balloon-pop.svg",
       targetGo: SP + "target-go.svg",
+      mole: SP + "mole.svg",
     },
     // Self-hosted display font (each entry expects a sibling OFL.txt license).
     fonts: {

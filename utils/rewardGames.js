@@ -50,6 +50,44 @@ const GAMES = [
     skill: "Nerve",
     roundSeconds: 20,
   },
+  {
+    id: "mole-bonk",
+    name: "Bonk!",
+    emoji: "🔨",
+    color: "#8a5c3a",
+    blurb: "Bonk the moles, dodge the bombs — go fast!",
+    skill: "Accuracy",
+    roundSeconds: 25,
+  },
+  {
+    id: "tower-stack",
+    name: "Tower Stack",
+    emoji: "🧱",
+    color: "#2bb673",
+    blurb: "Drop each block dead-center to build the tallest tower!",
+    skill: "Precision",
+    roundSeconds: 30,
+  },
+  {
+    id: "echo",
+    name: "Echo",
+    emoji: "🎵",
+    color: "#7c5cff",
+    blurb: "Watch the pattern, then play it back. How long can you echo?",
+    skill: "Memory",
+    // Turn-based (ends on a mistake or at the max sequence); this is a nominal
+    // estimate for a full run, not a hard timer the client enforces.
+    roundSeconds: 45,
+  },
+  {
+    id: "star-chase",
+    name: "Star Chase",
+    emoji: "⭐",
+    color: "#f6c945",
+    blurb: "Race the maze and grab every star before time runs out!",
+    skill: "Navigation",
+    roundSeconds: 30,
+  },
 ];
 
 function listGames() {
