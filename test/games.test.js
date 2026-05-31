@@ -44,6 +44,8 @@ test("every new game is wired into the server catalog", () => {
 test("every new game is loaded by play.html", () => {
   const html = fs.readFileSync(path.join(ROOT, "public/play.html"), "utf8");
   for (const g of NEW_GAMES) {
-    assert.match(html, new RegExp(g.file.replace(/[/.]/g, "\\$&")), `play.html does not load ${g.file}`);
+    // Scripts are served from the web root, so the URL drops the "public/" prefix.
+    const url = "/" + g.file.replace(/^public\//, "");
+    assert.match(html, new RegExp(url.replace(/[/.]/g, "\\$&")), `play.html does not load ${url}`);
   }
 });

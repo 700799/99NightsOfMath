@@ -75,7 +75,9 @@ const GAMES = [
     color: "#7c5cff",
     blurb: "Watch the pattern, then play it back. How long can you echo?",
     skill: "Memory",
-    roundSeconds: 0,
+    // Turn-based (ends on a mistake or at the max sequence); this is a nominal
+    // estimate for a full run, not a hard timer the client enforces.
+    roundSeconds: 45,
   },
   {
     id: "star-chase",
