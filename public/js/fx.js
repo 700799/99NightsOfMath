@@ -417,6 +417,7 @@
     confetti,
     shake,
     sound,
+    tone,
     haptic,
     isMuted,
     setMuted,
